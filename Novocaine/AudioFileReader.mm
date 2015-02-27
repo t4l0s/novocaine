@@ -47,7 +47,12 @@
 @property (nonatomic, assign) UInt32 numSamplesReadPerPacket;
 @property (nonatomic, assign) UInt32 desiredPrebufferedSamples;
 @property (nonatomic, assign) SInt64 currentFileTime;
+
+#if OS_OBJECT_HAVE_OBJC_SUPPORT
+@property (nonatomic, strong) dispatch_source_t callbackTimer;
+#else
 @property (nonatomic, assign) dispatch_source_t callbackTimer;
+#endif
 
 - (void)bufferNewAudio;
 
@@ -274,7 +279,9 @@
     // Release the dispatch timer because it holds a reference to this class instance
     [self pause];
     if (self.callbackTimer) {
+#if !OS_OBJECT_HAVE_OBJC_SUPPORT
         dispatch_release(self.callbackTimer);
+#endif
         self.callbackTimer = nil;
     }
 }
